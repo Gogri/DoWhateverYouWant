@@ -1,0 +1,176 @@
+
+/**
+ * Write a description of class NameList here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+import java.util.*;
+public class NameList {
+    ArrayList<Person> nList;
+    
+    // NameList constructor - takes an ArrayList of Person Objects
+    public NameList(ArrayList<Person> nList) {
+        this.nList = nList;
+    }
+    
+    //Randomizes the order of nList
+    public void scramble() {
+        for (int i = 0; i < nList.size(); i++) {
+            int swap = (int)(Math.random() * nList.size());
+            Person temp = nList.get(swap);
+            nList.set(swap, nList.get(i));
+            nList.set(i, temp);
+        }
+    }
+    
+    //Assignes targets to the People objects in nList
+    public void match() {
+        Person temp = nList.get(0);
+        for (int i = 0; i < nList.size() - 1; i++) {
+            nList.get(i).setTarget(nList.get(i + 1));
+        }
+        nList.get(nList.size() - 1).setTarget(temp);
+    }
+    
+    //Returns nList without the target assignments
+    public String toStringNoTarget() {
+        String s = "";
+        for (int i = 0; i < nList.size(); i++) {
+            s += (i + 1) + "\t" + nList.get(i).toStringNoTarget() + "\r\n";
+        }
+        return s;
+    }
+    
+    //Returns only the names in nList
+    public String toStringNames() {
+        String s = "";
+        for (int i = 0; i < nList.size(); i++) {
+            s += nList.get(i).getName() + "\r\n";
+        }
+        return s;
+    }
+    
+    //Returns only the emails in nList
+    public String toStringEmails() {
+        String s = "";
+        for (int i = 0; i < nList.size(); i++) {
+            s += nList.get(i).getEmail() + "\r\n";
+        }
+        return s;
+    }
+    
+    //Returns a String version of nList
+    public String toString() {
+        String s = "";
+        for (int i = 0; i < nList.size(); i++) {
+            s += (i + 1) + "\t" + nList.get(i) + "\r\n";
+        }
+        return s;
+    }
+    
+    //Finds the index of a name or target in a Person object in nList
+    private int find(String type, String name) {
+        if (type.equals("name")) {
+            int index = 0;
+            boolean found = false;
+            while (!found && index < nList.size()) {
+                if (nList.get(index).getName().contains(name)) {
+                    found = true;
+                } else {
+                    index++;
+                }
+            }
+            return index;
+        } else if (type.equals("target")) {
+            int index = 0;
+            boolean found = false;
+            while (!found && index < nList.size()) {
+                if (nList.get(index).getTarget().contains(name)) {
+                    found = true;
+                } else {
+                    index++;
+                }
+            }
+            return index;
+        }
+        return -50;
+    } 
+    
+    //Removes a Person object from nList based on its name
+    public String remove(String name) {
+        int rIndex = find("name", name);
+        Person two = nList.get(rIndex);
+        int tIndex = find("target", name);
+        Person one = nList.get(tIndex);
+        String three = two.getTarget();
+        one.setTarget(three);
+        nList.remove(rIndex);
+        return one.toString();
+    }
+    
+    /*//Replaces a Person in nList
+    public String replace(String name, String replacement, String email) {
+        int index = find("name", name);
+        Person r = new Person(replacement, email,nList.get(index).getTarget());
+        nList.set(index, r);
+        mergeSort();
+        return r.toString();
+    }
+    */
+    
+    //Sorts nList alphabetically by first name
+    public void mergeSort() {
+        ArrayList<Person> merged = nList;
+        nList = split(merged);
+    }
+    private ArrayList<Person> split(ArrayList<Person> merged) {
+        if (merged.size() == 1) {
+            return merged;
+        }
+        ArrayList<Person> l1 = new ArrayList<Person>();
+        ArrayList<Person> l2 = new ArrayList<Person>();
+        for (int i = 0; i < merged.size() / 2; i++) {
+            l1.add(merged.get(i));
+        }
+        for (int i = merged.size() / 2; i < merged.size(); i++) {
+            l2.add(merged.get(i));
+        }
+        l1 = split(l1);
+        l2 = split(l2);
+        merged = merge(l1, l2);
+        return merged;
+    }
+    private ArrayList<Person> merge(ArrayList<Person> l1, ArrayList<Person> l2) {
+        int a = 0;
+        int b = 0;
+        ArrayList<Person> merged = new ArrayList<Person>();
+        while (!(a == l1.size() && b == l2.size())) {
+            if (a == l1.size()) {
+                for (int i = b; i < l2.size(); i++) {
+                    merged.add(l2.get(i));
+                }
+                break;
+            } else if (b == l2.size()) {
+                for (int i = a; i < l1.size(); i++) {
+                    merged.add(l1.get(i));
+                }
+                break;
+            }
+            int compared = l1.get(a).getName().compareTo(l2.get(b).getName());
+            if (compared < 0) {
+                merged.add(l1.get(a));
+                a++;
+            } else if (compared > 0) {
+                merged.add(l2.get(b));
+                b++;
+            } else {
+                merged.add(l1.get(a));
+                merged.add(l2.get(b));
+                a++;
+                b++;
+            }
+        }
+        return merged;
+    }
+}
